@@ -1,3 +1,5 @@
+const { csvKeyMap, defaultStockConfig } = require('../constants')
+
 const wanhuaConfig = {
     n: 5,
     g1: 0.15,
@@ -10,6 +12,34 @@ const wanhuaConfig = {
     stockHolderEquity: 1482323.44,
     minorityInterest: 325226.15,
     stockNumber: 216223
+}
+
+
+function getStandardKey(nonStandardKey) {
+  return csvKeyMap[nonStandardKey] || nonStandardKey;
+}
+
+function computeCFFOYearly(yearlyData) {
+  //   {
+  //   year: 2012,
+  //   businessActivityNetCash: 380600,
+  //   assetsDepreciationPreparation: 3512.85,
+  //   assetsDepreciation: 73100,
+  //   intangibleAssetsDepreciation: 1185.67,
+  //   longTermPrepaid: 766.52,
+  //   lossOnDisposalOfAssets: 17000,
+  //   cashFlowFromOperation: 292060.66
+  // },
+  const {
+    businessActivityNetCash,
+    assetsDepreciationPreparation,
+    assetsDepreciation,
+    intangibleAssetsDepreciation,
+    longTermPrepaid,
+    lossOnDisposalOfAssets
+  } = yearlyData;
+  const res = businessActivityNetCash + assetsDepreciationPreparation - assetsDepreciation - intangibleAssetsDepreciation - longTermPrepaid - lossOnDisposalOfAssets
+  return res;
 }
 class FreeCashFlowEstimate {
   computeValueByFCF(config) {
@@ -60,14 +90,59 @@ class StockDataProcess {
     }
     return t;
   }
+
   toJson(arr) {
     const transposed = this.transpose(arr)
     const headers = transposed.shift();
     const res = transposed.map(row => row.reduce((acc, col, ind) => {
-      acc[headers[ind]] = !Number.isNaN(+col) ? +col : col;
+      acc[getStandardKey(headers[ind])] = !Number.isNaN(+col) ? +col : col;
       return acc;
     }, {}))
     return res;
+  }
+
+  getStockBaseConfig(jsonArrData, defaultStockConfig) {
+  // const wanhuaConfig = {
+  //     n: 5,
+  //     g1: 0.15,
+  //     g2: 0.04,
+  //     wacc: 0.0616,
+  //     fcf0: 303385.10,
+  //     financeCash: 208636.18,
+  //     longStockInvestment: 18612.81,
+  //     longTermLiabilities: 0, // 长期债务
+  //     shortTermLiabilities: 0, // 短期债务
+  //     interestExpense: 0, // 利息支出
+  //     liabilities: 2313423.57,
+  //     stockHolderEquity: 1482323.44,
+  //     minorityInterest: 325226.15,
+  //     stockNumber: 216223
+  // }
+    const resConfig = { ...defaultStockConfig }
+    const n = defaultStockConfig.n;
+    const cashFlowFromOperationArr = jsonArrData.slice(0, n).map(item => {
+      return computeCFFOYearly(item);
+    })
+    resConfig.fcf0 = cashFlowFromOperationArr.reduce((res, item) => res + item, 0) / n
+    resConfig.financeCash = jsonArrData[0].financeCash;
+    resConfig.longStockInvestment = jsonArrData[0].longStockInvestment;
+    resConfig.longTermLiabilities = jsonArrData[0].longTermLiabilities;
+    resConfig.shortTermLiabilities = jsonArrData[0].shortTermLiabilities;
+    resConfig.interestExpense = jsonArrData[0].interestExpense;
+    resConfig.liabilities = jsonArrData[0].liabilities;
+    resConfig.stockHolderEquity = jsonArrData[0].stockHolderEquity;
+    resConfig.minorityInterest = jsonArrData[0].minorityInterest;
+    resConfig.stockNumber = jsonArrData[0].stockNumber;
+    function computeWacc(config) {
+      const { incomeTaxRate, expectedReturnOnEquity } = config;
+      const totalCapital = resConfig.stockHolderEquity + resConfig.liabilities;
+      const preTaxDebtCostRate = resConfig.interestExpense / (resConfig.longTermLiabilities + resConfig.shortTermLiabilities);
+      const weightedCapitalCostRateByEquity = expectedReturnOnEquity * (resConfig.stockHolderEquity / totalCapital);
+      const weightedCapitalCostRateByDebt = (1 - incomeTaxRate) * preTaxDebtCostRate * (resConfig.liabilities / totalCapital);
+      return weightedCapitalCostRateByEquity + weightedCapitalCostRateByDebt;
+    }
+    resConfig.wacc = computeWacc(defaultStockConfig);
+    return resConfig
   }
 }
 
