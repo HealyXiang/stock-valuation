@@ -1,8 +1,8 @@
 const baseConfig = {
   name: ['圣农发展'],
   n: 5,
-  g1: 0.11,
-  g2: 0.04,
+  g1: 0.11, // 第一阶段预测增长率
+  g2: 0.04, // 第二阶段预测增长率
   incomeTaxRate: 0.25, // 公司实际所得税税率
   expectedReturnOnEquity: 0.09, // 股权期望回报率
   wacc: 0.074832,
