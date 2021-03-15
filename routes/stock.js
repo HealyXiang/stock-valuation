@@ -65,8 +65,9 @@ router.get('/', async (ctx, next) => {
    dongfangdianlan
    jinfengkeji
    zhongguozhongmian
+   tiantanshengwu
 */
-const targetStock = 'zhongguozhongmian'
+const targetStock = 'dongfangdianlan'
 
 router.get('/wanhua', async (ctx, next) => {
   const { baseConfig, yearlyData } = getBaseStockInfo(targetStock);
