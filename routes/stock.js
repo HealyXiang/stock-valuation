@@ -66,10 +66,13 @@ router.get('/', async (ctx, next) => {
    jinfengkeji
    zhongguozhongmian
    tiantanshengwu
+   hongluganggou
+   huacejiance
+   yunnanbaiyao
 */
-const targetStock = 'dongfangdianlan'
+const targetStock = 'jinfengkeji'
 
-router.get('/wanhua', async (ctx, next) => {
+router.get('/data', async (ctx, next) => {
   const { baseConfig, yearlyData } = getBaseStockInfo(targetStock);
 
   const jsonRes = stockDataProcessor.toJson(yearlyData);
