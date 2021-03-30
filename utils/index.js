@@ -58,8 +58,8 @@ class FreeCashFlowEstimate {
     return res
   }
   computeStockPriceByFCF(config) {
-    const { financeCash, longStockInvestment, liabilities, stockHolderEquity, minorityInterest, stockNumber } = config;
-    const allStockRightsValue = financeCash + longStockInvestment + this.computeValueByFCF(config) - liabilities;
+    const { financeCash, longStockInvestment, liabilities, stockHolderEquity, minorityInterest, stockNumber, interestBearingDebt } = config;
+    const allStockRightsValue = financeCash + longStockInvestment + this.computeValueByFCF(config) - interestBearingDebt;
     const allStockValue = allStockRightsValue * (1 - minorityInterest / stockHolderEquity);
     return allStockValue / stockNumber;
   }
@@ -101,6 +101,15 @@ class StockDataProcess {
     return res;
   }
 
+  computeInterestBearingDebt(oneYearData) {
+    console.log('oneYearData:', oneYearData)
+    return oneYearData.shortTermLiabilities
+      + oneYearData.longTermLiabilitiesDueWithin1year
+      + oneYearData.longTermLiabilities
+      + oneYearData.bondsPayable
+      + oneYearData.longTermPayable
+  }
+
   getStockBaseConfig(jsonArrData, defaultStockConfig) {
   // const wanhuaConfig = {
   //     n: 5,
@@ -130,13 +139,14 @@ class StockDataProcess {
     resConfig.shortTermLiabilities = jsonArrData[0].shortTermLiabilities;
     resConfig.interestExpense = jsonArrData[0].interestExpense;
     resConfig.liabilities = jsonArrData[0].liabilities;
+    resConfig.interestBearingDebt = this.computeInterestBearingDebt(jsonArrData[0])
     resConfig.stockHolderEquity = jsonArrData[0].stockHolderEquity;
     resConfig.minorityInterest = jsonArrData[0].minorityInterest;
     resConfig.stockNumber = jsonArrData[0].stockNumber;
     function computeWacc(config) {
       const { incomeTaxRate, expectedReturnOnEquity } = config;
       const totalCapital = resConfig.stockHolderEquity + resConfig.liabilities;
-      const preTaxDebtCostRate = resConfig.interestExpense / (resConfig.longTermLiabilities + resConfig.shortTermLiabilities);
+      const preTaxDebtCostRate = resConfig.interestExpense / (resConfig.liabilities); // TODO: 确定此处分母使用公司总负债还是有息负债？
       const weightedCapitalCostRateByEquity = expectedReturnOnEquity * (resConfig.stockHolderEquity / totalCapital);
       const weightedCapitalCostRateByDebt = (1 - incomeTaxRate) * preTaxDebtCostRate * (resConfig.liabilities / totalCapital);
       return weightedCapitalCostRateByEquity + weightedCapitalCostRateByDebt;

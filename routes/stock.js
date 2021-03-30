@@ -70,7 +70,7 @@ router.get('/', async (ctx, next) => {
    huacejiance
    yunnanbaiyao
 */
-const targetStock = 'wanhuahuaxue'
+const targetStock = 'dongfangdianlan'
 
 router.get('/data', async (ctx, next) => {
   const { baseConfig, yearlyData } = getBaseStockInfo(targetStock);
@@ -84,6 +84,8 @@ router.get('/data', async (ctx, next) => {
     n: `预估第一阶段时间: ${baseConfig.n}年`,
     g1: `预估第一阶段增长率: ${baseConfig.g1 * 100}%`,
     g2: `预估第二阶段增长率: ${baseConfig.g2 * 100}%`,
+    liabilities: `公司债务: ${stockConfig.liabilities / 10000} 亿`,
+    interestBearingDebt: `有息负债: ${stockConfig.interestBearingDebt / 10000} 亿`,
     wacc: `加权资本成本率: ${(stockConfig.wacc * 100).toFixed(2)}%`
   })
 })

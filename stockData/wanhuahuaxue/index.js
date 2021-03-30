@@ -10,6 +10,7 @@ const baseConfig = {
   financeCash: 456600, // 金融资产
   longStockInvestment: 71800, // 长期股权投资
   liabilities: 5293400, // 公司债务
+  interestBearingDebt: 0, // 有息债务
   stockHolderEquity: 4393100, // 股东权益合计
   minorityInterest: 156700, // 少数股东权益
   stockNumber: 314000 // 发行的股份数量
