@@ -144,11 +144,20 @@ class StockDataProcess {
     resConfig.minorityInterest = jsonArrData[0].minorityInterest;
     resConfig.stockNumber = jsonArrData[0].stockNumber;
     function computeWacc(config) {
+      /*
+        计算WACC, 即加权资本成本率
+        对债权 股权占资产的比例进行了调整，债权占比不超过50%，股权占比不低于50%
+      */
       const { incomeTaxRate, expectedReturnOnEquity } = config;
       const totalCapital = resConfig.stockHolderEquity + resConfig.liabilities;
-      const preTaxDebtCostRate = resConfig.interestExpense / (resConfig.liabilities); // TODO: 确定此处分母使用公司总负债还是有息负债？
-      const weightedCapitalCostRateByEquity = expectedReturnOnEquity * (resConfig.stockHolderEquity / totalCapital);
-      const weightedCapitalCostRateByDebt = (1 - incomeTaxRate) * preTaxDebtCostRate * (resConfig.liabilities / totalCapital);
+      const preTaxDebtCostRate = resConfig.interestExpense / (resConfig.interestBearingDebt); // 分母使用有息负债
+      // const stockRatio = resConfig.stockHolderEquity / totalCapital;
+      // const debtRatio = resConfig.liabilities / totalCapital;
+      const stockRatio = Math.max(0.5, resConfig.stockHolderEquity / totalCapital); // 股权占比 <= 0.5
+      const debtRatio = Math.min(0.5, resConfig.liabilities / totalCapital); // 债权占比 >= 0.5
+      console.log('未调整的债权占比: ', `${resConfig.liabilities * 100 / totalCapital}%`)
+      const weightedCapitalCostRateByEquity = expectedReturnOnEquity * stockRatio;
+      const weightedCapitalCostRateByDebt = (1 - incomeTaxRate) * preTaxDebtCostRate * debtRatio;
       return weightedCapitalCostRateByEquity + weightedCapitalCostRateByDebt;
     }
     resConfig.wacc = computeWacc(defaultStockConfig);

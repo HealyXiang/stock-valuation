@@ -1,8 +1,8 @@
 const baseConfig = {
   name: ['鸿路钢构'],
   n: 5,
-  g1: 0.07,
-  g2: 0.04,
+  g1: 0.10,
+  g2: 0.032,
   incomeTaxRate: 0.25, // 公司实际所得税税率
   expectedReturnOnEquity: 0.09, // 股权期望回报率
   wacc: 0.06375,
