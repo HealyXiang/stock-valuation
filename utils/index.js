@@ -156,6 +156,7 @@ class StockDataProcess {
       const stockRatio = Math.max(0.5, resConfig.stockHolderEquity / totalCapital); // 股权占比 <= 0.5
       const debtRatio = Math.min(0.5, resConfig.liabilities / totalCapital); // 债权占比 >= 0.5
       console.log('未调整的债权占比: ', `${resConfig.liabilities * 100 / totalCapital}%`)
+      console.log('调整后的债权占比: ', debtRatio)
       const weightedCapitalCostRateByEquity = expectedReturnOnEquity * stockRatio;
       const weightedCapitalCostRateByDebt = (1 - incomeTaxRate) * preTaxDebtCostRate * debtRatio;
       return weightedCapitalCostRateByEquity + weightedCapitalCostRateByDebt;
