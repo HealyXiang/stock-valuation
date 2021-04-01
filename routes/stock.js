@@ -71,8 +71,11 @@ router.get('/', async (ctx, next) => {
    yunnanbaiyao
    tongceyiliao
    zhonglianzhongke
+   jiuguijiu
+   longjigufen
+   tongweigufen
 */
-const targetStock = 'zhonglianzhongke'
+const targetStock = 'longjigufen'
 
 router.get('/data', async (ctx, next) => {
   const { baseConfig, yearlyData } = getBaseStockInfo(targetStock);

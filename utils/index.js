@@ -150,7 +150,7 @@ class StockDataProcess {
       */
       const { incomeTaxRate, expectedReturnOnEquity } = config;
       const totalCapital = resConfig.stockHolderEquity + resConfig.liabilities;
-      const preTaxDebtCostRate = resConfig.interestExpense / (resConfig.interestBearingDebt); // 分母使用有息负债
+      const preTaxDebtCostRate = resConfig.interestBearingDebt === 0 ? 0 : resConfig.interestExpense / (resConfig.interestBearingDebt); // 分母使用有息负债
       // const stockRatio = resConfig.stockHolderEquity / totalCapital;
       // const debtRatio = resConfig.liabilities / totalCapital;
       const stockRatio = Math.max(0.5, resConfig.stockHolderEquity / totalCapital); // 股权占比 <= 0.5
