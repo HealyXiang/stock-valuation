@@ -1,8 +1,8 @@
 const baseConfig = {
   name: ['三一重工'],
   n: 5,
-  g1: 0.10,
-  g2: 0.035,
+  g1: 0.08,
+  g2: 0.03,
   incomeTaxRate: 0.25, // 公司实际所得税税率
   expectedReturnOnEquity: 0.09, // 股权期望回报率
   wacc: 0.06375,

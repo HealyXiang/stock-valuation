@@ -1,8 +1,8 @@
 const baseConfig = {
-  name: ['鸿路钢构'],
+  name: ['国瓷材料'],
   n: 5,
-  g1: 0.10,
-  g2: 0.035,
+  g1: 0.15,
+  g2: 0.04,
   incomeTaxRate: 0.25, // 公司实际所得税税率
   expectedReturnOnEquity: 0.09, // 股权期望回报率
   wacc: 0.06375,
